@@ -14,6 +14,11 @@ app.get("/urls", (request, response) => {
   response.render("urls_index", templateVars);
 });
 
+app.get("/urls/:id", (req, res) => {
+  let templateVars = { shortURL: req.params.id, url: urlDatabase[req.params.id] };
+  res.render("urls_show", templateVars);
+});
+
 app.get("/urls.json", (request, response) => {
   response.json(urlDatabase);
 });
