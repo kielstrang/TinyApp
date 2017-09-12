@@ -71,6 +71,17 @@ app.post("/urls/:id/delete", (request, response) => {
   }
 });
 
+app.post("/urls/:id", (request, response) => {
+  const shortURL = request.params.id;
+  const longURL = request.body.longURL;
+  if (shortURL in urlDatabase) {
+    urlDatabase[shortURL] = longURL;
+    response.redirect('/urls');
+  } else {
+    response.redirect('/urls/notfound');
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
