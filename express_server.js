@@ -1,4 +1,5 @@
 var express = require("express");
+var crypto = require("crypto");
 var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
 
@@ -11,6 +12,10 @@ let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+function generateRandomString(strLength) {
+  return crypto.randomBytes(Math.ceil(strLength / 2)).toString('hex').slice(0, strLength);
+}
 
 app.get("/urls", (request, response) => {
   let templateVars = { urls: urlDatabase };
@@ -31,8 +36,11 @@ app.get("/urls.json", (request, response) => {
 });
 
 app.post("/urls", (request, response) => {
+  const shortURL = generateRandomString(6);
   console.log(request.body);
-  response.send("Ok");
+  const longURL = request.body.longURL;
+  urlDatabase[shortURL] = longURL;
+  response.send(`${longURL} shortened to ${shortURL}`);
 });
 
 app.listen(PORT, () => {
