@@ -40,8 +40,8 @@ app.get("/urls/:id", (request, response) => {
   response.render("urls_show", templateVars);
 });
 
-app.get("/u/:shortURL", (request, response) => {
-  const shortURL = request.params.shortURL;
+app.get("/u/:id", (request, response) => {
+  const shortURL = request.params.id;
   if (shortURL in urlDatabase) {
     const longURL = urlDatabase[shortURL];
     response.redirect(longURL);
@@ -59,6 +59,16 @@ app.post("/urls", (request, response) => {
   const longURL = request.body.longURL;
   urlDatabase[shortURL] = longURL;
   response.redirect(`/urls/${shortURL}`);
+});
+
+app.post("/urls/:id/delete", (request, response) => {
+  const shortURL = request.params.id;
+  if (shortURL in urlDatabase) {
+    delete urlDatabase[shortURL];
+    response.redirect('/urls');
+  } else {
+    response.redirect('/urls/notfound');
+  }
 });
 
 app.listen(PORT, () => {

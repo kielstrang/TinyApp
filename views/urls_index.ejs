@@ -9,8 +9,8 @@
   <% include partials/_header %>
   <table>
     <% for (const shortURL in urls) { %>
-      <tr>
-        <form method="POST" action=<%= `"/urls/${shortURL}/delete"` %>>
+      <tr></tr>
+        <form method="POST" action=<%= `/urls/${shortURL}/delete` %>>
           <td><a href=<%= `/u/${shortURL}` %>><%= urls[shortURL] %></a></td>
           <td> &rarr; <a href=<%= `/urls/${shortURL}` %>><%= shortURL %></a></td>
           <td><input type="submit" value="Delete"></td>
