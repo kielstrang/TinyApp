@@ -26,14 +26,23 @@ app.get("/urls/new", (request, response) => {
   response.render("urls_new");
 });
 
+app.get("/urls/notfound", (request, response) => {
+  response.render("urls_notfound");
+});
+
 app.get("/urls/:id", (request, response) => {
   let templateVars = { shortURL: request.params.id, url: urlDatabase[request.params.id] };
   response.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (request, response) => {
-  const longURL = urlDatabase[request.params.shortURL];
-  response.redirect(longURL);
+  const shortURL = request.params.shortURL;
+  if (shortURL in urlDatabase) {
+    const longURL = urlDatabase[shortURL];
+    response.redirect(longURL);
+  } else {
+    response.redirect('http://localhost:8080/urls/notfound');
+  }
 });
 
 app.get("/urls.json", (request, response) => {
