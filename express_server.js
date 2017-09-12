@@ -14,16 +14,8 @@ app.get("/urls", (request, response) => {
   response.render("urls_index", templateVars);
 });
 
-app.get("/", (request, response) => {
-  response.end("Hello!");
-});
-
 app.get("/urls.json", (request, response) => {
   response.json(urlDatabase);
-});
-
-app.get("/hello", (request, response) => {
-  response.end("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 app.listen(PORT, () => {
