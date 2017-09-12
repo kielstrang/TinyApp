@@ -11,8 +11,8 @@
     <% for (const shortURL in urls) { %>
       <tr></tr>
         <form method="POST" action=<%= `/urls/${shortURL}/delete` %>>
+          <td><a href=<%= `/urls/${shortURL}` %>><%= shortURL %></a> &rarr; </td>
           <td><a href=<%= `/u/${shortURL}` %>><%= urls[shortURL] %></a></td>
-          <td> &rarr; <a href=<%= `/urls/${shortURL}` %>><%= shortURL %></a></td>
           <td><input type="submit" value="Delete"></td>
         </form>
       </tr>

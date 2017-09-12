@@ -9,8 +9,8 @@
   <% include partials/_header %>
   <table>
     <tr>
+      <td><%= shortURL %> &rarr; </td>
       <td><a href= <%= `/u/${shortURL}` %>><%= url%></a></td>
-          <td> &rarr; <%= shortURL %></td>
     </tr>
   </table>
   <a href="/urls">Back to List</a>
