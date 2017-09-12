@@ -14,7 +14,12 @@ let urlDatabase = {
 };
 
 function generateRandomString(strLength) {
-  return crypto.randomBytes(Math.ceil(strLength / 2)).toString('hex').slice(0, strLength);
+  let str = "";
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (var i = 0; i < strLength; i++) {
+    text += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+  }
+  return str;
 }
 
 app.get("/urls", (request, response) => {
@@ -41,7 +46,7 @@ app.get("/u/:shortURL", (request, response) => {
     const longURL = urlDatabase[shortURL];
     response.redirect(longURL);
   } else {
-    response.redirect('http://localhost:8080/urls/notfound');
+    response.redirect('/urls/notfound');
   }
 });
 
@@ -53,7 +58,7 @@ app.post("/urls", (request, response) => {
   const shortURL = generateRandomString(6);
   const longURL = request.body.longURL;
   urlDatabase[shortURL] = longURL;
-  response.redirect(`http://localhost:8080/urls/${shortURL}`);
+  response.redirect(`/urls/${shortURL}`);
 });
 
 app.listen(PORT, () => {
