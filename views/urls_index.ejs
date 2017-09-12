@@ -1,20 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>TinyApp</title>
 </head>
+
 <body>
-    <table>
+  <table>
+    <tr>
+      <td>URL</td>
+      <td>Short URL</td>
+    </tr>
+    <% for (const shortURL in urls) { %>
       <tr>
-        <td>URL</td>
-        <td>Short URL</td>
+        <td>
+          <%= urls[shortURL] %>
+        </td>
+        <td>
+          <%= shortURL %>
+        </td>
       </tr>
-      <% for (const shortURL in urls) { %>
-        <tr>
-          <td><%= urls[shortURL] %></td>
-          <td><%= shortURL %></td>
-        </tr>
       <% } %>
-    </table>
+  </table>
 </body>
+
 </html>
