@@ -2,10 +2,17 @@ var express = require("express");
 var app = express();
 var PORT = process.env.PORT || 8080; // default port 8080
 
-var urlDatabase = {
+app.set("view engine", "ejs");
+
+let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+app.get("/urls", (request, response) => {
+  let templateVars = { urls: urlDatabase };
+  response.render("urls_index", templateVars);
+});
 
 app.get("/", (request, response) => {
   response.end("Hello!");
