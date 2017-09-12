@@ -17,7 +17,7 @@ function generateRandomString(strLength) {
   let str = "";
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   for (var i = 0; i < strLength; i++) {
-    text += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+    str += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
   }
   return str;
 }

@@ -8,18 +8,13 @@
 <body>
   <% include partials/_header %>
   <table>
-    <tr>
-      <td>URL</td>
-      <td>Short URL</td>
-    </tr>
     <% for (const shortURL in urls) { %>
       <tr>
-        <td>
-          <%= urls[shortURL] %>
-        </td>
-        <td>
-          <a href= <%= `/u/${shortURL}` %>><%= shortURL %></a>
-        </td>
+        <form method="POST" action=<%= `"/urls/${shortURL}/delete"` %>>
+          <td><a href=<%= `/u/${shortURL}` %>><%= urls[shortURL] %></a></td>
+          <td> &rarr; <a href=<%= `/urls/${shortURL}` %>><%= shortURL %></a></td>
+          <td><input type="submit" value="Delete"></td>
+        </form>
       </tr>
       <% } %>
   </table>
