@@ -37,10 +37,9 @@ app.get("/urls.json", (request, response) => {
 
 app.post("/urls", (request, response) => {
   const shortURL = generateRandomString(6);
-  console.log(request.body);
   const longURL = request.body.longURL;
   urlDatabase[shortURL] = longURL;
-  response.send(`${longURL} shortened to ${shortURL}`);
+  response.redirect(`http://localhost:8080/urls/${shortURL}`);
 });
 
 app.listen(PORT, () => {
