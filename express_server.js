@@ -26,9 +26,14 @@ app.get("/urls/new", (request, response) => {
   response.render("urls_new");
 });
 
-app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id, url: urlDatabase[req.params.id] };
-  res.render("urls_show", templateVars);
+app.get("/urls/:id", (request, response) => {
+  let templateVars = { shortURL: request.params.id, url: urlDatabase[request.params.id] };
+  response.render("urls_show", templateVars);
+});
+
+app.get("/u/:shortURL", (request, response) => {
+  const longURL = urlDatabase[request.params.shortURL];
+  response.redirect(longURL);
 });
 
 app.get("/urls.json", (request, response) => {

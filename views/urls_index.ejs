@@ -18,11 +18,12 @@
           <%= urls[shortURL] %>
         </td>
         <td>
-          <%= shortURL %>
+          <a href= <%= `http://localhost:8080/u/${shortURL}` %>><%= shortURL %></a>
         </td>
       </tr>
       <% } %>
   </table>
+  <a href="http://localhost:8080/urls/new">Shorten New URL</a>
 </body>
 
 </html>
