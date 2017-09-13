@@ -30,7 +30,7 @@ let users = {
 //pass login cookie and urlDatabase to templates using local variables
 app.use(function (request, response, next) {
   response.locals = {
-    username : request.cookies['username'],
+    user: users[request.cookies['user_id']],
     urlDatabase: urlDatabase
   };
   next();
@@ -69,6 +69,10 @@ app.get("/u/:id", (request, response) => {
   } else {
     response.redirect('/urls/notfound');
   }
+});
+
+app.get("/login", (request, response) => {
+  response.render("login");
 });
 
 app.get("/register", (request, response) => {
@@ -131,12 +135,21 @@ app.post("/register", (request, response) => {
 });
 
 app.post("/login", (request, response) => {
-  response.cookie('username', request.body.username);
-  response.redirect('/urls');
+  const { email, password } = request.body;
+  for (id in users) {
+    if (users[id].email === email && users[id].password === password) {
+      response.cookie('user_id', id);
+      response.redirect('/');
+      return;
+    }
+  }
+
+  response.status(403);
+  response.send("Incorrect email or password");
 });
 
 app.post("/logout", (request, response) => {
-  response.clearCookie('username');
+  response.clearCookie('user_id');
   response.redirect('/urls');
 });
 
