@@ -58,6 +58,10 @@ app.get("/u/:id", (request, response) => {
   }
 });
 
+app.get("/register", (request, response) => {
+  response.render("register");
+});
+
 app.post("/urls", (request, response) => {
   const shortURL = generateRandomString(6);
   const longURL = request.body.longURL;
