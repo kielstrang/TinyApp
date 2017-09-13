@@ -15,7 +15,7 @@ let urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-//pass in login cookie and urlDatabase
+//pass login cookie and urlDatabase to templates using local variables
 app.use(function (request, response, next) {
   response.locals = {
     username : request.cookies['username'],
@@ -46,8 +46,7 @@ app.get("/urls/notfound", (request, response) => {
 });
 
 app.get("/urls/:id", (request, response) => {
-  let templateVars = { shortURL: request.params.id };
-  response.render("urls_show", templateVars);
+  response.render("urls_show", { shortURL: request.params.id });
 });
 
 app.get("/u/:id", (request, response) => {
@@ -58,10 +57,6 @@ app.get("/u/:id", (request, response) => {
   } else {
     response.redirect('/urls/notfound');
   }
-});
-
-app.get("/urls.json", (request, response) => {
-  response.json(urlDatabase);
 });
 
 app.post("/urls", (request, response) => {
@@ -94,6 +89,12 @@ app.post("/urls/:id", (request, response) => {
 
 app.post("/login", (request, response) => {
   response.cookie('username', request.body.username);
+  response.redirect('/urls');
+});
+
+app.post("/logout", (request, response) => {
+  console.log(request.cookies['username']);
+  response.clearCookie('username');
   response.redirect('/urls');
 });
 
