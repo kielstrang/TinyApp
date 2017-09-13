@@ -1,5 +1,4 @@
 var express = require("express");
-var crypto = require("crypto");
 const bodyParser = require("body-parser");
 var cookieParser = require('cookie-parser');
 
@@ -93,7 +92,6 @@ app.post("/login", (request, response) => {
 });
 
 app.post("/logout", (request, response) => {
-  console.log(request.cookies['username']);
   response.clearCookie('username');
   response.redirect('/urls');
 });
