@@ -108,11 +108,12 @@ app.post("/urls", (request, response) => {
   urlDatabase[shortURL] = {
     short: shortURL,
     long: longURL,
-    userID: 'placeholder'
+    userID: response.locals.user
   };
   response.redirect(`/urls/${shortURL}`);
 });
 
+//Delete URL
 app.post("/urls/:id/delete", (request, response) => {
   const shortURL = request.params.id;
   if (shortURL in urlDatabase) {
@@ -123,6 +124,7 @@ app.post("/urls/:id/delete", (request, response) => {
   }
 });
 
+//Edit URL
 app.post("/urls/:id", (request, response) => {
   const shortURL = request.params.id;
   const longURL = request.body.longURL;
@@ -130,7 +132,7 @@ app.post("/urls/:id", (request, response) => {
     urlDatabase[shortURL] = {
       short: shortURL,
       long: longURL,
-      userID: 'placeholder'
+      userID: response.locals.user
     };
     response.redirect('/urls');
   } else {
