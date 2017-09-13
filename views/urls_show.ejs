@@ -8,10 +8,16 @@
 <body>
   <% include partials/_header %>
   <h3>ShortURL: <%= url.short %></h3>
-  <form method="POST" action=<%= `/urls/${url.short}` %>>
-    <input type="text" style="width:300px" name="longURL" value=<%= url.long %>>
-    <input type="submit" value="Update">
-  </form>
+  <% if (auth) { %>
+    <form method="POST" action=<%= `/urls/${url.short}` %>>
+      <input type="text" style="width:300px" name="longURL" value=<%= url.long %>>
+      <input type="submit" value="Update">
+    </form>
+  <% } else { %>
+    <div><%= url.short %> &rarr; <a href=<%= `/u/${url.short}` %>><%= url.long %></a></div>
+    <br>
+    <div>If you created this ShortURL, <a href="/login">login</a> to edit it.</div>
+  <% } %>
   <br>
   <a href="/urls">Back to List</a>
 </body>

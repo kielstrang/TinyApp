@@ -109,8 +109,8 @@ function checkUserOwnsURL (request, response, next) {
 
 //Get list of URLs
 app.get("/urls", (request, response) => {
-  response.locals.urls = getUserURLs(response.locals.user);
-  response.render("urls_index");
+  const urls = getUserURLs(response.locals.user);
+  response.render("urls_index", { urls: urls});
 });
 
 //Get form for new short URL
@@ -125,8 +125,10 @@ app.get("/urls/notfound", (request, response) => {
 
 //Show single shortened URL
 app.get("/urls/:id", checkURLExists, (request, response) => {
-  const url = urlDatabase[request.params.id];
-  response.render("urls_show", { url: url });
+  const urlID = request.params.id;
+  const url = urlDatabase[urlID];
+  const auth = userOwnsURL(response.locals.user, urlID);
+  response.render("urls_show", { url: url, auth: auth });
 });
 
 //Short URL redirects to long URL
