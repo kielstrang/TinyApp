@@ -39,7 +39,8 @@ let users = {
 app.use(function (request, response, next) {
   response.locals = {
     user: users[request.cookies['user_id']],
-    urlDatabase: urlDatabase
+    urlDatabase: urlDatabase,
+    users: users
   };
   next();
 });
@@ -62,16 +63,35 @@ function getUserByEmail(email) {
   return undefined;
 }
 
+function checkLogin (request, response, next) {
+  const userID = response.locals.user.id;
+  console.log(userID);
+  console.log(users);
+  if(userID !== undefined && userID in users) {
+    next();
+  } else {
+    response.redirect('/login');
+  }
+}
+
+function checkURLExists (request, response, next) {
+  const shortURL = request.params.id;
+  if (shortURL in response.locals.urlDatabase) {
+    next();
+  } else {
+    response.redirect('/urls/notfound');
+  }
+}
+
+function checkUserOwnsURL (request, response, next) {
+  next();
+}
+
 app.get("/urls", (request, response) => {
   response.render("urls_index");
 });
 
-app.get("/urls/new", (request, response) => {
-  if(!response.locals.user) {
-    response.redirect('/login');
-    return;
-  }
-
+app.get("/urls/new", checkLogin, (request, response) => {
   response.render("urls_new");
 });
 
@@ -79,19 +99,15 @@ app.get("/urls/notfound", (request, response) => {
   response.render("urls_notfound");
 });
 
-app.get("/urls/:id", (request, response) => {
+app.get("/urls/:id", checkURLExists, (request, response) => {
   const url = urlDatabase[request.params.id];
   response.render("urls_show", { url: url });
 });
 
-app.get("/u/:id", (request, response) => {
+app.get("/u/:id", checkURLExists, (request, response) => {
   const shortURL = request.params.id;
-  if (shortURL in urlDatabase) {
-    const longURL = urlDatabase[shortURL].long;
-    response.redirect(longURL);
-  } else {
-    response.redirect('/urls/notfound');
-  }
+  const longURL = urlDatabase[shortURL].long;
+  response.redirect(longURL);
 });
 
 app.get("/login", (request, response) => {
@@ -114,30 +130,23 @@ app.post("/urls", (request, response) => {
 });
 
 //Delete URL
-app.post("/urls/:id/delete", (request, response) => {
+app.post("/urls/:id/delete", checkLogin, checkURLExists, checkUserOwnsURL, (request, response) => {
   const shortURL = request.params.id;
-  if (shortURL in urlDatabase) {
-    delete urlDatabase[shortURL];
-    response.redirect('/urls');
-  } else {
-    response.redirect('/urls/notfound');
-  }
+  delete urlDatabase[shortURL];
+  response.redirect('/urls');
 });
 
 //Edit URL
-app.post("/urls/:id", (request, response) => {
+app.post("/urls/:id", checkLogin, checkURLExists, checkUserOwnsURL, (request, response) => {
   const shortURL = request.params.id;
   const longURL = request.body.longURL;
-  if (shortURL in urlDatabase) {
-    urlDatabase[shortURL] = {
-      short: shortURL,
-      long: longURL,
-      userID: response.locals.user
-    };
-    response.redirect('/urls');
-  } else {
-    response.redirect('/urls/notfound');
-  }
+
+  urlDatabase[shortURL] = {
+    short: shortURL,
+    long: longURL,
+    userID: response.locals.user
+  };
+  response.redirect('/urls');
 });
 
 app.post("/register", (request, response) => {
