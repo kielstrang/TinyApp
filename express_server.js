@@ -59,6 +59,11 @@ app.get("/urls", (request, response) => {
 });
 
 app.get("/urls/new", (request, response) => {
+  if(!user) {
+    response.redirect('login');
+    return;
+  }
+
   response.render("urls_new");
 });
 
