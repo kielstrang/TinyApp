@@ -10,8 +10,16 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
 let urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {
+    short: "b2xVn2",
+    long: "http://www.lighthouselabs.ca",
+    userID: "userRandomID"
+  },
+  "9sm5xK": {
+    short: "9sm5xK",
+    long: "http://www.google.com",
+    userID: "userRandomID2"
+  }
 };
 
 let users = { 
@@ -59,8 +67,8 @@ app.get("/urls", (request, response) => {
 });
 
 app.get("/urls/new", (request, response) => {
-  if(!user) {
-    response.redirect('login');
+  if(!response.locals.user) {
+    response.redirect('/login');
     return;
   }
 
@@ -72,13 +80,14 @@ app.get("/urls/notfound", (request, response) => {
 });
 
 app.get("/urls/:id", (request, response) => {
-  response.render("urls_show", { shortURL: request.params.id });
+  const url = urlDatabase[request.params.id];
+  response.render("urls_show", { url: url });
 });
 
 app.get("/u/:id", (request, response) => {
   const shortURL = request.params.id;
   if (shortURL in urlDatabase) {
-    const longURL = urlDatabase[shortURL];
+    const longURL = urlDatabase[shortURL].long;
     response.redirect(longURL);
   } else {
     response.redirect('/urls/notfound');
@@ -96,7 +105,11 @@ app.get("/register", (request, response) => {
 app.post("/urls", (request, response) => {
   const shortURL = generateRandomString(6);
   const longURL = request.body.longURL;
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL] = {
+    short: shortURL,
+    long: longURL,
+    userID: 'placeholder'
+  };
   response.redirect(`/urls/${shortURL}`);
 });
 
@@ -114,7 +127,11 @@ app.post("/urls/:id", (request, response) => {
   const shortURL = request.params.id;
   const longURL = request.body.longURL;
   if (shortURL in urlDatabase) {
-    urlDatabase[shortURL] = longURL;
+    urlDatabase[shortURL] = {
+      short: shortURL,
+      long: longURL,
+      userID: 'placeholder'
+    };
     response.redirect('/urls');
   } else {
     response.redirect('/urls/notfound');

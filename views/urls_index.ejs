@@ -8,11 +8,12 @@
 <body>
   <% include partials/_header %>
   <table>
-    <% for (const shortURL in urlDatabase) { %>
+    <% for (const id in urlDatabase) { %>
+      <% const url = urlDatabase[id] %>
       <tr></tr>
-        <form method="POST" action=<%= `/urls/${shortURL}/delete` %>>
-          <td><a href=<%= `/urls/${shortURL}` %>><%= shortURL %></a> &rarr; </td>
-          <td><a href=<%= `/u/${shortURL}` %>><%= urlDatabase[shortURL] %></a></td>
+        <form method="POST" action=<%= `/urls/${url.short}/delete` %>>
+          <td><a href=<%= `/urls/${url.short}` %>><%= url.short %></a> &rarr; </td>
+          <td><a href=<%= `/u/${url.short}` %>><%= url.long %></a></td>
           <td><input type="submit" value="Delete"></td>
         </form>
       </tr>

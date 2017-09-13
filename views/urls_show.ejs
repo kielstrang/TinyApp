@@ -7,9 +7,9 @@
 
 <body>
   <% include partials/_header %>
-  <h3>ShortURL: <%= shortURL %></h3>
-  <form method="POST" action=<%= `/urls/${shortURL}` %>>
-    <input type="text" style="width:300px" name="longURL" value=<%= urlDatabase[shortURL] %>>
+  <h3>ShortURL: <%= url.short %></h3>
+  <form method="POST" action=<%= `/urls/${url.short}` %>>
+    <input type="text" style="width:300px" name="longURL" value=<%= url.long %>>
     <input type="submit" value="Update">
   </form>
   <br>
