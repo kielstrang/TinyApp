@@ -10,11 +10,19 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
-
 let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+//pass in login cookie and urlDatabase
+app.use(function (request, response, next) {
+  response.locals = {
+    username : request.cookies['username'],
+    urlDatabase: urlDatabase
+  };
+  next();
+});
 
 function generateRandomString(strLength) {
   let str = "";
@@ -26,8 +34,7 @@ function generateRandomString(strLength) {
 }
 
 app.get("/urls", (request, response) => {
-  let templateVars = { urls: urlDatabase };
-  response.render("urls_index", templateVars);
+  response.render("urls_index");
 });
 
 app.get("/urls/new", (request, response) => {
@@ -39,7 +46,7 @@ app.get("/urls/notfound", (request, response) => {
 });
 
 app.get("/urls/:id", (request, response) => {
-  let templateVars = { shortURL: request.params.id, url: urlDatabase[request.params.id] };
+  let templateVars = { shortURL: request.params.id };
   response.render("urls_show", templateVars);
 });
 
