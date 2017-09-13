@@ -45,6 +45,15 @@ function generateRandomString(strLength) {
   return str;
 }
 
+function getUserByEmail(email) {
+  for (const id in users) {
+    if (users[id].email === email) {
+      return users[id];
+    }
+  }
+  return undefined;
+}
+
 app.get("/urls", (request, response) => {
   response.render("urls_index");
 });
@@ -111,20 +120,21 @@ app.post("/register", (request, response) => {
   const userID = generateRandomString(8);
   const { email, password } = request.body;
 
+  //Guard for missing email or password
   if (email === '' || password ==='') {
     response.status(400);
     response.send("Please specify an email and password");
     return;
   }
   
-  for (id in users) {
-    if (users[id].email === email) {
-      response.status(400);
-      response.send("This email is already registered");
-      return;
-    }
+  //Guard for already registered email
+  if (getUserByEmail(email) !== undefined) {
+    response.status(400);
+    response.send("This email is already registered");
+    return;
   }
 
+  //Register the user
   users[userID] = {
     id: userID,
     email: email,
@@ -136,16 +146,15 @@ app.post("/register", (request, response) => {
 
 app.post("/login", (request, response) => {
   const { email, password } = request.body;
-  for (id in users) {
-    if (users[id].email === email && users[id].password === password) {
-      response.cookie('user_id', id);
-      response.redirect('/');
-      return;
-    }
-  }
+  const user = getUserByEmail(email);
 
-  response.status(403);
-  response.send("Incorrect email or password");
+  if(user && user.password === password) {
+    response.cookie('user_id', user.id);
+    response.redirect('/');
+  } else {
+    response.status(403);
+    response.send("Incorrect email or password");
+  }
 });
 
 app.post("/logout", (request, response) => {
