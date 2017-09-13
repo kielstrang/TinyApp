@@ -14,6 +14,19 @@ let urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+let users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "correct-horse-battery-staple"
+  },
+  "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "plaintext-passwords-are-fun"
+  }
+};
+
 //pass login cookie and urlDatabase to templates using local variables
 app.use(function (request, response, next) {
   response.locals = {
@@ -88,6 +101,17 @@ app.post("/urls/:id", (request, response) => {
   } else {
     response.redirect('/urls/notfound');
   }
+});
+
+app.post("/register", (request, response) => {
+  const userID = generateRandomString(8);
+  users[userID] = {
+    id: userID,
+    email: request.body.email,
+    password: request.body.password
+  };
+  response.cookie('user_id', userID);
+  response.redirect('/urls');
 });
 
 app.post("/login", (request, response) => {
