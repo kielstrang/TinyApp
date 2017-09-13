@@ -105,10 +105,26 @@ app.post("/urls/:id", (request, response) => {
 
 app.post("/register", (request, response) => {
   const userID = generateRandomString(8);
+  const { email, password } = request.body;
+
+  if (email === '' || password ==='') {
+    response.status(400);
+    response.send("Please specify an email and password");
+    return;
+  }
+  
+  for (id in users) {
+    if (users[id].email === email) {
+      response.status(400);
+      response.send("This email is already registered");
+      return;
+    }
+  }
+
   users[userID] = {
     id: userID,
-    email: request.body.email,
-    password: request.body.password
+    email: email,
+    password: password
   };
   response.cookie('user_id', userID);
   response.redirect('/urls');
