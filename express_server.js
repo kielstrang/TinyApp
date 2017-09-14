@@ -92,7 +92,7 @@ app.post('/urls/:id/delete', check.isAuthenticated('Log in to delete a shortURL:
 });
 
 //Edit URL
-app.post('/urls/:id', check.isAuthenticated('Log in to edit this shortURL:', '/urls/:id'), check.urlExists, check.userOwnsURL, (req, res) => {
+app.post('/urls/:id', check.isAuthenticated('Log in to edit this shortURL:', '/urls'), check.urlExists, check.userOwnsURL, (req, res) => {
   urldb.saveURL(req.params.id, req.body.longURL, res.locals.user.id);
   res.redirect('/urls');
 });
