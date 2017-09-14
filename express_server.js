@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 const urldb = require("./url-database");
 const userdb = require("./user-database");
+const check = require('./express-helpers');
 
 const app = express();
 const PORT = process.env.PORT || 8080; // default port 8080
@@ -28,49 +29,6 @@ function generateRandomString(strLength) {
   return str;
 }
 
-
-
-function isAuthenticated (request, response, next) {
-  const user = response.locals.user;
-  if(user && user.id in userdb.getAllUsers()) return next();
-  response.redirect('/login');
-}
-
-function checkURLExists (request, response, next) {
-  const shortURL = request.params.id;
-  if (shortURL in urldb.getAllURLs()) return next();
-  response.status(404);
-  response.redirect('/urls/notfound');
-}
-
-function checkUserOwnsURL (request, response, next) {
-  if (urldb.userOwnsURL(response.locals.user, request.params.id)) return next();
-  response.status(401);
-  response.send("You don't own this URL.");
-}
-
-function checkValidEmailPassword (request, response, next) {
-  const { email, password } = request.body;
-  if (email && password) return next();
-  response.status(400);
-  response.send("Please specify an email and password");
-}
-
-function checkEmailAvailable (request, response, next) {
-  if (!userdb.getUserByEmail(request.body.email)) return next();
-  response.status(400);
-  response.send("This email is already registered");
-}
-
-function checkValidLogin (request, response, next) {
-  const { email, password } = request.body;
-  const user = userdb.getUserByEmail(email);
-
-  if(user && user.password === password) return next();
-  response.status(401);
-  response.send("Incorrect email or password");
-}
-
 //Root redirects to urls or login
 app.get("/", (request, response) => {
   if(response.locals.user) {
@@ -87,7 +45,7 @@ app.get("/urls", (request, response) => {
 });
 
 //Get form for new short URL
-app.get("/urls/new", isAuthenticated, (request, response) => {
+app.get("/urls/new", check.isAuthenticated, (request, response) => {
   response.render("urls_new");
 });
 
@@ -97,14 +55,14 @@ app.get("/urls/notfound", (request, response) => {
 });
 
 //Show single shortened URL
-app.get("/urls/:id", checkURLExists, (request, response) => {
+app.get("/urls/:id", check.urlExists, (request, response) => {
   const url = urldb.getURL(request.params.id);
   const auth = urldb.userOwnsURL(response.locals.user, url.short);
   response.render("urls_show", { url: url, auth: auth });
 });
 
 //Short URL redirects to long URL
-app.get("/u/:id", checkURLExists, (request, response) => {
+app.get("/u/:id", check.urlExists, (request, response) => {
   const shortURL = request.params.id;
   const longURL = urldb.getURL(shortURL).long;
   console.log('Redirecting to ' + longURL);
@@ -122,26 +80,26 @@ app.get("/register", (request, response) => {
 });
 
 //Add new short URL
-app.post("/urls", isAuthenticated, (request, response) => {
+app.post("/urls", check.isAuthenticated, (request, response) => {
   const newShortURL = generateRandomString(6);
   urldb.saveURL(newShortURL, request.body.longURL, response.locals.user.id);
   response.redirect(`/urls/${newShortURL}`);
 });
 
 //Delete URL
-app.post("/urls/:id/delete", isAuthenticated, checkURLExists, checkUserOwnsURL, (request, response) => {
+app.post("/urls/:id/delete", check.isAuthenticated, check.urlExists, check.userOwnsURL, (request, response) => {
   urldb.deleteURL(request.params.id);
   response.redirect('/urls');
 });
 
 //Edit URL
-app.post("/urls/:id", isAuthenticated, checkURLExists, checkUserOwnsURL, (request, response) => {
+app.post("/urls/:id", check.isAuthenticated, check.urlExists, check.userOwnsURL, (request, response) => {
   urldb.saveURL(request.params.id, request.body.longURL, response.locals.user.id);
   response.redirect('/urls');
 });
 
 //Register user
-app.post("/register", checkValidEmailPassword, checkEmailAvailable, (request, response) => {
+app.post("/register", check.validEmailPassword, check.emailAvailable, (request, response) => {
   const userID = generateRandomString(8);
   const { email, password } = request.body;
   userdb.saveUser(userID, email, password);
@@ -150,7 +108,7 @@ app.post("/register", checkValidEmailPassword, checkEmailAvailable, (request, re
 });
 
 //Log in
-app.post("/login", checkValidLogin, (request, response) => {
+app.post("/login", check.validLogin, (request, response) => {
   const user = userdb.getUserByEmail(request.body.email);
   response.cookie('user_id', user.id);
   response.redirect('/');
