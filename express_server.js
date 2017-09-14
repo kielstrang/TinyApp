@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const urldb = require('./url-database');
 const userdb = require('./user-database');
 const check = require('./route-helpers');
@@ -11,14 +11,19 @@ const PORT = process.env.PORT || 8080; // default port 8080
 const URL_LENGTH = 6;
 const USER_LENGTH = 8;
 
+const SESSION_NAME = 'tinyapp-session';
+const SESSION_KEY = 'correct-horse-battery-staple';
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: SESSION_NAME,
+  secret: SESSION_KEY
+}));
 
 //get login cookie
 app.use(function (req, res, next) {
   res.locals = {
-    user: userdb.getUser(req.cookies['user_id'])
+    user: userdb.getUser(req.session.user_id)
   };
   next();
 });
@@ -96,20 +101,20 @@ app.post('/register', check.validEmailPassword, check.emailAvailable, (req, res)
   const userID = random.generateString(USER_LENGTH);
   const { email, password } = req.body;
   userdb.saveUser(userID, email, password);
-  res.cookie('user_id', userID);
+  req.session.user_id = userID;
   res.redirect('/urls');
 });
 
 //Log in
 app.post('/login', check.validLogin, (req, res) => {
   const user = userdb.getUserByEmail(req.body.email);
-  res.cookie('user_id', user.id);
+  req.session.user_id = user.id;
   res.redirect('/');
 });
 
 //Log out
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect('/urls');
 });
 
