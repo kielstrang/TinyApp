@@ -20,7 +20,8 @@ app.use(cookieSession({ name: SESSION_NAME, secret: SESSION_KEY }));
 //read user from session cookie
 app.use(function (req, res, next) {
   res.locals = {
-    user: userdb.getUser(req.session.user_id)
+    user: userdb.getUser(req.session.user_id),
+    loginState: { message: '', redirect: '/urls'}
   };
   next();
 });
@@ -35,13 +36,13 @@ app.get('/', (req, res) => {
 });
 
 //Get list of URLs
-app.get('/urls', (req, res) => {
+app.get('/urls', check.isAuthenticated('Log in to view your shortURLs:', '/urls'), (req, res) => {
   const userURLs = urldb.getUserURLs(res.locals.user);
   res.render('urls_index', { userURLs: userURLs});
 });
 
 //Get form for new short URL
-app.get('/urls/new', check.isAuthenticated, (req, res) => {
+app.get('/urls/new', check.isAuthenticated('Log in to add a new shortURL:', '/urls/new'), (req, res) => {
   res.render('urls_new');
 });
 
@@ -69,6 +70,7 @@ app.get('/login', (req, res) => {
   if(res.locals.user) {
     res.redirect('/urls');
   } else {
+    res.locals.loginState.message = 'Log in to TinyApp:';
     res.render('login');
   }
 });
@@ -83,20 +85,20 @@ app.get('/register', (req, res) => {
 });
 
 //Add new short URL
-app.post('/urls', check.isAuthenticated, (req, res) => {
+app.post('/urls', check.isAuthenticated('Log in to add a new shortURL:', '/urls/new'), (req, res) => {
   const newShortURL = random.generateString(URL_LENGTH);
   urldb.saveURL(newShortURL, req.body.longURL, res.locals.user.id);
   res.redirect(`/urls/${newShortURL}`);
 });
 
 //Delete URL
-app.post('/urls/:id/delete', check.isAuthenticated, check.urlExists, check.userOwnsURL, (req, res) => {
+app.post('/urls/:id/delete', check.isAuthenticated('Log in to delete a shortURL:', '/urls'), check.urlExists, check.userOwnsURL, (req, res) => {
   urldb.deleteURL(req.params.id);
   res.redirect('/urls');
 });
 
 //Edit URL
-app.post('/urls/:id', check.isAuthenticated, check.urlExists, check.userOwnsURL, (req, res) => {
+app.post('/urls/:id', check.isAuthenticated('Log in to edit this shortURL:', '/urls/:id'), check.urlExists, check.userOwnsURL, (req, res) => {
   urldb.saveURL(req.params.id, req.body.longURL, res.locals.user.id);
   res.redirect('/urls');
 });
@@ -114,7 +116,7 @@ app.post('/register', check.validEmailPassword, check.emailAvailable, (req, res)
 app.post('/login', check.validLogin, (req, res) => {
   const user = userdb.getUserByEmail(req.body.email);
   req.session.user_id = user.id;
-  res.redirect('/');
+  res.redirect(req.body.loginRedirect);
 });
 
 //Log out

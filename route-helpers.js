@@ -3,10 +3,13 @@ const urldb = require('./url-database');
 const userdb = require('./user-database');
 
 const expressHelpers = {
-  isAuthenticated: (req, res, next) => {
-    const user = res.locals.user;
-    if(user && user.id in userdb.getAllUsers()) return next();
-    res.redirect('/login');
+  isAuthenticated: (message, redirect) => {
+    return (req, res, next) => {
+      res.locals.loginState = {message: message, redirect: redirect.replace(':id', req.params.id)};
+      const user = res.locals.user;
+      if(user && user.id in userdb.getAllUsers()) return next();
+      res.render('login');
+    };
   },
   
   urlExists: (req, res, next) => {
