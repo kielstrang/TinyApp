@@ -1,6 +1,7 @@
 const express = require('express'),
   bodyParser = require('body-parser'),
   cookieSession = require('cookie-session'),
+  methodOverride = require('method-override'),
   urldb = require('./lib/url-database'),
   userdb = require('./lib/user-database'),
   check = require('./lib/route-helpers'),
@@ -16,6 +17,7 @@ const app = express();
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({ name: SESSION_NAME, secret: SESSION_KEY }));
+app.use(methodOverride('_method'));
 
 //read user from session cookie
 app.use((req, res, next) => {
@@ -86,13 +88,13 @@ app.post('/urls', check.isAuthenticated('Log in to add a new shortURL:', '/urls/
 });
 
 //Delete URL
-app.post('/urls/:id/delete', check.isAuthenticated('Log in to delete a shortURL:', '/urls'), check.urlExists, check.userOwnsURL, (req, res) => {
+app.delete('/urls/:id/delete', check.isAuthenticated('Log in to delete a shortURL:', '/urls'), check.urlExists, check.userOwnsURL, (req, res) => {
   urldb.deleteURL(req.params.id);
   res.redirect('/urls');
 });
 
 //Edit URL
-app.post('/urls/:id', check.isAuthenticated('Log in to edit this shortURL:', '/urls'), check.urlExists, check.userOwnsURL, (req, res) => {
+app.put('/urls/:id', check.isAuthenticated('Log in to edit this shortURL:', '/urls'), check.urlExists, check.userOwnsURL, (req, res) => {
   urldb.saveURL(req.params.id, req.body.longURL, res.locals.user.id);
   res.redirect('/urls');
 });

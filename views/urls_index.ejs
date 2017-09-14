@@ -11,7 +11,7 @@
     <% for (const id in userURLs) { %>
       <% const url = userURLs[id] %>
       <tr></tr>
-        <form method="POST" action=<%= `/urls/${url.short}/delete` %>>
+        <form method="POST" action=<%= `/urls/${url.short}/delete?_method=DELETE` %>>
           <td><a href=<%= `/urls/${url.short}` %>><%= url.short %></a> &rarr; </td>
           <td><a href=<%= `/u/${url.short}` %>><%= url.long %></a></td>
           <td><input type="submit" value="Delete"></td>
