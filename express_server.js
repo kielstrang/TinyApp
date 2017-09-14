@@ -89,6 +89,15 @@ function checkValidLogin (request, response, next) {
   }
 }
 
+//Root redirects to urls or login
+app.get("/", (request, response) => {
+  if(response.locals.user) {
+    response.redirect("/urls");
+  } else {
+    response.redirect("/login");
+  }
+});
+
 //Get list of URLs
 app.get("/urls", (request, response) => {
   const userURLs = urldb.getUserURLs(response.locals.user);
