@@ -66,12 +66,20 @@ app.get('/u/:id', check.urlExists, (req, res) => {
 
 //Get login page
 app.get('/login', (req, res) => {
-  res.render('login');
+  if(res.locals.user) {
+    res.redirect('/urls');
+  } else {
+    res.render('login');
+  }
 });
 
 //Get registration page
 app.get('/register', (req, res) => {
-  res.render('register');
+  if(res.locals.user) {
+    res.redirect('/urls');
+  } else {
+    res.render('register');
+  }
 });
 
 //Add new short URL
