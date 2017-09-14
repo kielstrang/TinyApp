@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const urldb = require('./url-database');
 const userdb = require('./user-database');
-const check = require('./express-helpers');
+const check = require('./route-helpers');
 const random = require('./random-helpers');
 
 const app = express();
