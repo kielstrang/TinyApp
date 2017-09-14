@@ -35,11 +35,11 @@ const expressHelpers = {
     res.send('This email is already registered');
   },
   
-  checkValidLogin: (req, res, next) => {
+  validLogin: (req, res, next) => {
     const { email, password } = req.body;
     const user = userdb.getUserByEmail(email);
   
-    if(user && user.password === password) return next();
+    if(user && userdb.checkPassword(user, password)) return next();
     res.status(401);
     res.send('Incorrect email or password');
   }

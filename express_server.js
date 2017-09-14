@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser');
 const urldb = require('./url-database');
 const userdb = require('./user-database');
 const check = require('./express-helpers');
-const random = require('/random-helpers');
+const random = require('./random-helpers');
 
 const app = express();
 const PORT = process.env.PORT || 8080; // default port 8080

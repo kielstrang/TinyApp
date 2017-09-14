@@ -1,3 +1,6 @@
+const bcrypt = require('bcrypt');
+const BCRYPT_ROUNDS = 12;
+
 const userDatabase = {};
 
 const userFunctions = {
@@ -23,12 +26,16 @@ const userFunctions = {
     userDatabase[id] = {
       id: id,
       email: email,
-      password: password
+      hash: bcrypt.hashSync(password, BCRYPT_ROUNDS)
     };
   },
   
   deleteUser: (userID) => {
     delete userDatabase[userID];
+  },
+
+  checkPassword: (user, password) => {
+    return bcrypt.compareSync(password, user.hash);
   }
 };
 
