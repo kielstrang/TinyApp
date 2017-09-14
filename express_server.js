@@ -1,18 +1,18 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cookieSession = require('cookie-session');
-const urldb = require('./url-database');
-const userdb = require('./user-database');
-const check = require('./route-helpers');
-const random = require('./random-helpers');
+const express = require('express'),
+  bodyParser = require('body-parser'),
+  cookieSession = require('cookie-session'),
+  urldb = require('./url-database'),
+  userdb = require('./user-database'),
+  check = require('./route-helpers'),
+  random = require('./random-helpers');
+
+const PORT = process.env.PORT || 8080, // default port 8080
+  URL_LENGTH = 6,
+  USER_LENGTH = 8,
+  SESSION_NAME = 'tinyapp-session',
+  SESSION_KEY = 'correct-horse-battery-staple';
 
 const app = express();
-const PORT = process.env.PORT || 8080; // default port 8080
-const URL_LENGTH = 6;
-const USER_LENGTH = 8;
-
-const SESSION_NAME = 'tinyapp-session';
-const SESSION_KEY = 'correct-horse-battery-staple';
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
@@ -20,7 +20,7 @@ app.use(cookieSession({
   secret: SESSION_KEY
 }));
 
-//get login cookie
+//read user from session cookie
 app.use(function (req, res, next) {
   res.locals = {
     user: userdb.getUser(req.session.user_id)
