@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
 //Get list of URLs
 app.get('/urls', check.isAuthenticated('Log in to view your shortURLs:', '/urls'), (req, res) => {
   const userURLs = urldb.getUserURLs(res.locals.user);
-  res.render('urls_index', { userURLs: userURLs});
+  res.render('urls_index', { userURLs });
 });
 
 //Get form for new short URL
@@ -56,7 +56,7 @@ app.get('/urls/notfound', (req, res) => {
 app.get('/urls/:id', check.urlExists, (req, res) => {
   const url = urldb.getURL(req.params.id);
   const auth = urldb.userOwnsURL(res.locals.user, url.short);
-  res.render('urls_show', { url: url, auth: auth });
+  res.render('urls_show', { url, auth });
 });
 
 //Short URL redirects to long URL

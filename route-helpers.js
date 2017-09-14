@@ -5,7 +5,8 @@ const userdb = require('./user-database');
 const expressHelpers = {
   isAuthenticated: (message, redirect) => {
     return (req, res, next) => {
-      res.locals.login = {message: message, redirect: redirect.replace(':id', req.params.id)};
+      redirect = redirect.replace(':id', req.params.id);
+      res.locals.login = {message, redirect};
       const user = res.locals.user;
       if(user && user.id in userdb.getAllUsers()) return next();
       res.render('login');
