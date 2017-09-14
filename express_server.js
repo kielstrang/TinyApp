@@ -30,63 +30,45 @@ function generateRandomString(strLength) {
 
 
 
-function checkLogin (request, response, next) {
+function isAuthenticated (request, response, next) {
   const user = response.locals.user;
-  if(user && user.id in userdb.getAllUsers()) {
-    next();
-  } else {
-    response.redirect('/login');
-  }
+  if(user && user.id in userdb.getAllUsers()) return next();
+  response.redirect('/login');
 }
 
 function checkURLExists (request, response, next) {
   const shortURL = request.params.id;
-  if (shortURL in urldb.getAllURLs()) {
-    next();
-  } else {
-    response.status(404);
-    response.redirect('/urls/notfound');
-  }
+  if (shortURL in urldb.getAllURLs()) return next();
+  response.status(404);
+  response.redirect('/urls/notfound');
 }
 
 function checkUserOwnsURL (request, response, next) {
-  if (urldb.userOwnsURL(response.locals.user, request.params.id)) {
-    next();
-  } else {
-    response.status(401);
-    response.send("You don't own this URL.");
-  }
+  if (urldb.userOwnsURL(response.locals.user, request.params.id)) return next();
+  response.status(401);
+  response.send("You don't own this URL.");
 }
 
 function checkValidEmailPassword (request, response, next) {
   const { email, password } = request.body;
-  if (email === '' || password === '') {
-    response.status(400);
-    response.send("Please specify an email and password");
-  } else {
-    next();
-  }
+  if (email && password) return next();
+  response.status(400);
+  response.send("Please specify an email and password");
 }
 
 function checkEmailAvailable (request, response, next) {
-  if (userdb.getUserByEmail(request.body.email)) {
-    response.status(400);
-    response.send("This email is already registered");
-  } else {
-    next();
-  }
+  if (!userdb.getUserByEmail(request.body.email)) return next();
+  response.status(400);
+  response.send("This email is already registered");
 }
 
 function checkValidLogin (request, response, next) {
   const { email, password } = request.body;
   const user = userdb.getUserByEmail(email);
 
-  if(user && user.password === password) {
-    next();
-  } else {
-    response.status(401);
-    response.send("Incorrect email or password");
-  }
+  if(user && user.password === password) return next();
+  response.status(401);
+  response.send("Incorrect email or password");
 }
 
 //Root redirects to urls or login
@@ -105,7 +87,7 @@ app.get("/urls", (request, response) => {
 });
 
 //Get form for new short URL
-app.get("/urls/new", checkLogin, (request, response) => {
+app.get("/urls/new", isAuthenticated, (request, response) => {
   response.render("urls_new");
 });
 
@@ -140,20 +122,20 @@ app.get("/register", (request, response) => {
 });
 
 //Add new short URL
-app.post("/urls", checkLogin, (request, response) => {
+app.post("/urls", isAuthenticated, (request, response) => {
   const newShortURL = generateRandomString(6);
   urldb.saveURL(newShortURL, request.body.longURL, response.locals.user.id);
   response.redirect(`/urls/${newShortURL}`);
 });
 
 //Delete URL
-app.post("/urls/:id/delete", checkLogin, checkURLExists, checkUserOwnsURL, (request, response) => {
+app.post("/urls/:id/delete", isAuthenticated, checkURLExists, checkUserOwnsURL, (request, response) => {
   urldb.deleteURL(request.params.id);
   response.redirect('/urls');
 });
 
 //Edit URL
-app.post("/urls/:id", checkLogin, checkURLExists, checkUserOwnsURL, (request, response) => {
+app.post("/urls/:id", isAuthenticated, checkURLExists, checkUserOwnsURL, (request, response) => {
   urldb.saveURL(request.params.id, request.body.longURL, response.locals.user.id);
   response.redirect('/urls');
 });
