@@ -1,26 +1,14 @@
-var express = require("express");
+const express = require("express");
 const bodyParser = require("body-parser");
-var cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
+const urldb = require("./url-database");
 
-var app = express();
-var PORT = process.env.PORT || 8080; // default port 8080
+const app = express();
+const PORT = process.env.PORT || 8080; // default port 8080
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
-
-let urlDatabase = {
-  "b2xVn2": {
-    short: "b2xVn2",
-    long: "http://www.lighthouselabs.ca",
-    userID: "userRandomID"
-  },
-  "9sm5xK": {
-    short: "9sm5xK",
-    long: "http://www.google.com",
-    userID: "userRandomID2"
-  }
-};
 
 let users = { 
   "userRandomID": {
@@ -61,24 +49,9 @@ function getUserByEmail(email) {
   return undefined;
 }
 
-function userOwnsURL(userID, urlID) {
-  const url = urlDatabase[urlID];
-  return url.userID === userID;
-}
-
-function getUserURLs(userID) {
-  const urls = {};
-  for (shortURL in urlDatabase) {
-    if (userOwnsURL(userID, shortURL)) {
-      urls[shortURL] = urlDatabase[shortURL];
-    }
-  }
-  return urls;
-}
-
 function checkLogin (request, response, next) {
-  const userID = response.locals.user.id;
-  if(userID !== undefined && userID in users) {
+  const user = response.locals.user;
+  if(user && user.id in users) {
     next();
   } else {
     response.redirect('/login');
@@ -87,7 +60,7 @@ function checkLogin (request, response, next) {
 
 function checkURLExists (request, response, next) {
   const shortURL = request.params.id;
-  if (shortURL in urlDatabase) {
+  if (shortURL in urldb.getAllURLs()) {
     next();
   } else {
     response.status(404);
@@ -96,10 +69,7 @@ function checkURLExists (request, response, next) {
 }
 
 function checkUserOwnsURL (request, response, next) {
-  const shortURL = request.params.id;
-  const userID = response.locals.user.id;
-  const ownerID = urlDatabase[shortURL].userID;
-  if (userID === ownerID) {
+  if (urldb.userOwnsURL(response.locals.user, request.params.id)) {
     next();
   } else {
     response.status(401);
@@ -109,8 +79,8 @@ function checkUserOwnsURL (request, response, next) {
 
 //Get list of URLs
 app.get("/urls", (request, response) => {
-  const urls = getUserURLs(response.locals.user);
-  response.render("urls_index", { urls: urls});
+  const userURLs = urldb.getUserURLs(response.locals.user);
+  response.render("urls_index", { userURLs: userURLs});
 });
 
 //Get form for new short URL
@@ -125,16 +95,15 @@ app.get("/urls/notfound", (request, response) => {
 
 //Show single shortened URL
 app.get("/urls/:id", checkURLExists, (request, response) => {
-  const urlID = request.params.id;
-  const url = urlDatabase[urlID];
-  const auth = userOwnsURL(response.locals.user, urlID);
+  const url = urldb.getURL(request.params.id);
+  const auth = urldb.userOwnsURL(response.locals.user, url.short);
   response.render("urls_show", { url: url, auth: auth });
 });
 
 //Short URL redirects to long URL
 app.get("/u/:id", checkURLExists, (request, response) => {
   const shortURL = request.params.id;
-  const longURL = urlDatabase[shortURL].long;
+  const longURL = getAllURLs(shortURL).long;
   response.redirect(longURL);
 });
 
@@ -150,33 +119,20 @@ app.get("/register", (request, response) => {
 
 //Add new short URL
 app.post("/urls", checkLogin, (request, response) => {
-  const shortURL = generateRandomString(6);
-  const longURL = request.body.longURL;
-  urlDatabase[shortURL] = {
-    short: shortURL,
-    long: longURL,
-    userID: response.locals.user
-  };
-  response.redirect(`/urls/${shortURL}`);
+  const newShortURL = generateRandomString(6);
+  urldb.saveURL(newShortURL, request.body.longURL, response.locals.user.id);
+  response.redirect(`/urls/${newShortURL}`);
 });
 
 //Delete URL
 app.post("/urls/:id/delete", checkLogin, checkURLExists, checkUserOwnsURL, (request, response) => {
-  const shortURL = request.params.id;
-  delete urlDatabase[shortURL];
+  urldb.deleteURL(request.params.id);
   response.redirect('/urls');
 });
 
 //Edit URL
 app.post("/urls/:id", checkLogin, checkURLExists, checkUserOwnsURL, (request, response) => {
-  const shortURL = request.params.id;
-  const longURL = request.body.longURL;
-
-  urlDatabase[shortURL] = {
-    short: shortURL,
-    long: longURL,
-    userID: response.locals.user
-  };
+  urldb.saveURL(request.params.id, request.body.longURL, response.locals.user.id);
   response.redirect('/urls');
 });
 
@@ -193,7 +149,7 @@ app.post("/register", (request, response) => {
   }
   
   //Guard for already registered email
-  if (getUserByEmail(email) !== undefined) {
+  if (getUserByEmail(email)) {
     response.status(400);
     response.send("This email is already registered");
     return;

@@ -8,8 +8,8 @@
 <body>
   <% include partials/_header %>
   <table>
-    <% for (const id in urls) { %>
-      <% const url = urls[id] %>
+    <% for (const id in userURLs) { %>
+      <% const url = userURLs[id] %>
       <tr></tr>
         <form method="POST" action=<%= `/urls/${url.short}/delete` %>>
           <td><a href=<%= `/urls/${url.short}` %>><%= url.short %></a> &rarr; </td>
