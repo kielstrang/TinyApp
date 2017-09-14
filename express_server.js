@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({ name: SESSION_NAME, secret: SESSION_KEY }));
 
 //read user from session cookie
-app.use(function (req, res, next) {
+app.use((req, res, next) => {
   res.locals = {
     user: userdb.getUser(req.session.user_id),
     login: { message: 'Log in to TinyApp:', redirect: '/urls'},
@@ -68,20 +68,14 @@ app.get('/u/:id', check.urlExists, (req, res) => {
 
 //Get login page
 app.get('/login', (req, res) => {
-  if(res.locals.user) {
-    res.redirect('/urls');
-  } else {
-    res.render('login');
-  }
+  if(res.locals.user) return res.redirect('/urls');
+  res.render('login');
 });
 
 //Get registration page
 app.get('/register', (req, res) => {
-  if(res.locals.user) {
-    res.redirect('/urls');
-  } else {
-    res.render('register');
-  }
+  if(res.locals.user) return res.redirect('/urls');
+  res.render('register');
 });
 
 //Add new short URL
