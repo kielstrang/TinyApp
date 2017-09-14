@@ -16,101 +16,101 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
 //get login cookie
-app.use(function (request, response, next) {
-  response.locals = {
-    user: userdb.getUser(request.cookies['user_id'])
+app.use(function (req, res, next) {
+  res.locals = {
+    user: userdb.getUser(req.cookies['user_id'])
   };
   next();
 });
 
 //Root redirects to urls or login
-app.get('/', (request, response) => {
-  if(response.locals.user) {
-    response.redirect('/urls');
+app.get('/', (req, res) => {
+  if(res.locals.user) {
+    res.redirect('/urls');
   } else {
-    response.redirect('/login');
+    res.redirect('/login');
   }
 });
 
 //Get list of URLs
-app.get('/urls', (request, response) => {
-  const userURLs = urldb.getUserURLs(response.locals.user);
-  response.render('urls_index', { userURLs: userURLs});
+app.get('/urls', (req, res) => {
+  const userURLs = urldb.getUserURLs(res.locals.user);
+  res.render('urls_index', { userURLs: userURLs});
 });
 
 //Get form for new short URL
-app.get('/urls/new', check.isAuthenticated, (request, response) => {
-  response.render('urls_new');
+app.get('/urls/new', check.isAuthenticated, (req, res) => {
+  res.render('urls_new');
 });
 
 //URL not found page
-app.get('/urls/notfound', (request, response) => {
-  response.render('urls_notfound');
+app.get('/urls/notfound', (req, res) => {
+  res.render('urls_notfound');
 });
 
 //Show single shortened URL
-app.get('/urls/:id', check.urlExists, (request, response) => {
-  const url = urldb.getURL(request.params.id);
-  const auth = urldb.userOwnsURL(response.locals.user, url.short);
-  response.render('urls_show', { url: url, auth: auth });
+app.get('/urls/:id', check.urlExists, (req, res) => {
+  const url = urldb.getURL(req.params.id);
+  const auth = urldb.userOwnsURL(res.locals.user, url.short);
+  res.render('urls_show', { url: url, auth: auth });
 });
 
 //Short URL redirects to long URL
-app.get('/u/:id', check.urlExists, (request, response) => {
-  const shortURL = request.params.id;
+app.get('/u/:id', check.urlExists, (req, res) => {
+  const shortURL = req.params.id;
   const longURL = urldb.getURL(shortURL).long;
-  response.redirect(longURL);
+  res.redirect(longURL);
 });
 
 //Get login page
-app.get('/login', (request, response) => {
-  response.render('login');
+app.get('/login', (req, res) => {
+  res.render('login');
 });
 
 //Get registration page
-app.get('/register', (request, response) => {
-  response.render('register');
+app.get('/register', (req, res) => {
+  res.render('register');
 });
 
 //Add new short URL
-app.post('/urls', check.isAuthenticated, (request, response) => {
+app.post('/urls', check.isAuthenticated, (req, res) => {
   const newShortURL = random.generateString(URL_LENGTH);
-  urldb.saveURL(newShortURL, request.body.longURL, response.locals.user.id);
-  response.redirect(`/urls/${newShortURL}`);
+  urldb.saveURL(newShortURL, req.body.longURL, res.locals.user.id);
+  res.redirect(`/urls/${newShortURL}`);
 });
 
 //Delete URL
-app.post('/urls/:id/delete', check.isAuthenticated, check.urlExists, check.userOwnsURL, (request, response) => {
-  urldb.deleteURL(request.params.id);
-  response.redirect('/urls');
+app.post('/urls/:id/delete', check.isAuthenticated, check.urlExists, check.userOwnsURL, (req, res) => {
+  urldb.deleteURL(req.params.id);
+  res.redirect('/urls');
 });
 
 //Edit URL
-app.post('/urls/:id', check.isAuthenticated, check.urlExists, check.userOwnsURL, (request, response) => {
-  urldb.saveURL(request.params.id, request.body.longURL, response.locals.user.id);
-  response.redirect('/urls');
+app.post('/urls/:id', check.isAuthenticated, check.urlExists, check.userOwnsURL, (req, res) => {
+  urldb.saveURL(req.params.id, req.body.longURL, res.locals.user.id);
+  res.redirect('/urls');
 });
 
 //Register user
-app.post('/register', check.validEmailPassword, check.emailAvailable, (request, response) => {
+app.post('/register', check.validEmailPassword, check.emailAvailable, (req, res) => {
   const userID = random.generateString(USER_LENGTH);
-  const { email, password } = request.body;
+  const { email, password } = req.body;
   userdb.saveUser(userID, email, password);
-  response.cookie('user_id', userID);
-  response.redirect('/urls');
+  res.cookie('user_id', userID);
+  res.redirect('/urls');
 });
 
 //Log in
-app.post('/login', check.validLogin, (request, response) => {
-  const user = userdb.getUserByEmail(request.body.email);
-  response.cookie('user_id', user.id);
-  response.redirect('/');
+app.post('/login', check.validLogin, (req, res) => {
+  const user = userdb.getUserByEmail(req.body.email);
+  res.cookie('user_id', user.id);
+  res.redirect('/');
 });
 
 //Log out
-app.post('/logout', (request, response) => {
-  response.clearCookie('user_id');
-  response.redirect('/urls');
+app.post('/logout', (req, res) => {
+  res.clearCookie('user_id');
+  res.redirect('/urls');
 });
 
 app.listen(PORT, () => {
