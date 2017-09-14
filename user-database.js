@@ -1,23 +1,12 @@
-const userDatabase = { 
-  "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
-    password: "correct-horse-battery-staple"
-  },
-  "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
-    password: "plaintext-passwords-are-fun"
-  }
-};
+const userDatabase = {};
 
 const userFunctions = {
 
-  getUser: function(userID) {
+  getUser: (userID) => {
     return userDatabase[userID];
   },
 
-  getUserByEmail: function(email) {
+  getUserByEmail: (email) => {
     for (const id in userDatabase) {
       if (userDatabase[id].email === email) {
         return userDatabase[id];
@@ -30,7 +19,7 @@ const userFunctions = {
     return userDatabase;
   },
   
-  saveUser: function(id, email, password) {
+  saveUser: (id, email, password) => {
     userDatabase[id] = {
       id: id,
       email: email,
@@ -38,7 +27,7 @@ const userFunctions = {
     };
   },
   
-  deleteUser: function(userID) {
+  deleteUser: (userID) => {
     delete userDatabase[userID];
   }
 };

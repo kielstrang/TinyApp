@@ -1,19 +1,8 @@
-const urlDatabase =  {
-  "b2xVn2": {
-    short: "b2xVn2",
-    long: "http://www.lighthouselabs.ca",
-    userID: "userRandomID"
-  },
-  "9sm5xK": {
-    short: "9sm5xK",
-    long: "http://www.google.com",
-    userID: "userRandomID2"
-  }
-};
+const urlDatabase =  {};
 
 const urlFunctions = {
 
-  getURL: function(shortURL) {
+  getURL: (shortURL) => {
     return urlDatabase[shortURL];
   },
 
@@ -21,7 +10,7 @@ const urlFunctions = {
     return urlDatabase;
   },
   
-  saveURL: function(shortURL, longURL, owner) {
+  saveURL: (shortURL, longURL, owner) => {
     urlDatabase[shortURL] = {
       short: shortURL,
       long: longURL,
@@ -29,18 +18,18 @@ const urlFunctions = {
     };
   },
   
-  deleteURL: function(shortURL) {
+  deleteURL: (shortURL) => {
     delete urlDatabase[shortURL];
   },
   
-  userOwnsURL: function(user, urlID) {
+  userOwnsURL: (user, urlID) => {
     if (!(user && (urlID in urlDatabase))) return false;
 
     const url = urlDatabase[urlID];
     return url && url.userID === user.id;
   },
   
-  getUserURLs: function(user) {
+  getUserURLs: (user) => {
     const urls = {};
     for (shortURL in urlDatabase) {
       if (this.userOwnsURL(user, shortURL)) {
