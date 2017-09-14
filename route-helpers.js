@@ -11,26 +11,26 @@ const expressHelpers = {
   
   urlExists: (req, res, next) => {
     const shortURL = req.params.id;
-    if (shortURL in urldb.getAllURLs()) return next();
+    if(shortURL in urldb.getAllURLs()) return next();
     res.status(404);
     res.redirect('/urls/notfound');
   },
   
   userOwnsURL: (req, res, next) => {
-    if (urldb.userOwnsURL(res.locals.user, req.params.id)) return next();
+    if(urldb.userOwnsURL(res.locals.user, req.params.id)) return next();
     res.status(401);
     res.send("You don't own this URL.");
   },
   
   validEmailPassword: (req, res, next) => {
     const { email, password } = req.body;
-    if (email && password) return next();
+    if(email && password) return next();
     res.status(400);
     res.send('Please specify an email and password');
   },
   
   emailAvailable: (req, res, next) => {
-    if (!userdb.getUserByEmail(req.body.email)) return next();
+    if(!userdb.getUserByEmail(req.body.email)) return next();
     res.status(400);
     res.send('This email is already registered');
   },
