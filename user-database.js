@@ -11,8 +11,8 @@ UserFunctions.prototype = {
   },
 
   getUserByEmail: (email) => {
-    for (const id in userDatabase) {
-      if (userDatabase[id].email === email) {
+    for(const id in userDatabase) {
+      if(userDatabase[id].email === email) {
         return userDatabase[id];
       }
     }

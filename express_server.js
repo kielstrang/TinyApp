@@ -14,11 +14,8 @@ const PORT = process.env.PORT || 8080, // default port 8080
 
 const app = express();
 app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieSession({
-  name: SESSION_NAME,
-  secret: SESSION_KEY
-}));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieSession({ name: SESSION_NAME, secret: SESSION_KEY }));
 
 //read user from session cookie
 app.use(function (req, res, next) {

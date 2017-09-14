@@ -24,7 +24,7 @@ URLFunctions.prototype = {
   },
   
   userOwnsURL: (user, urlID) => {
-    if (!(user && (urlID in urlDatabase))) return false;
+    if(!(user && (urlID in urlDatabase))) return false;
 
     const url = urlDatabase[urlID];
     return url && url.userID === user.id;
@@ -32,8 +32,8 @@ URLFunctions.prototype = {
   
   getUserURLs: (user) => {
     const urls = {};
-    for (shortURL in urlDatabase) {
-      if (URLFunctions.prototype.userOwnsURL(user, shortURL)) {
+    for(shortURL in urlDatabase) {
+      if(URLFunctions.prototype.userOwnsURL(user, shortURL)) {
         urls[shortURL] = urlDatabase[shortURL];
       }
     }
