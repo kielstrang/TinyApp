@@ -1,6 +1,8 @@
 const urlDatabase =  {};
 
-const urlFunctions = {
+const URLFunctions = function () {};
+
+URLFunctions.prototype = {
 
   getURL: (shortURL) => {
     return urlDatabase[shortURL];
@@ -32,7 +34,7 @@ const urlFunctions = {
   getUserURLs: (user) => {
     const urls = {};
     for (shortURL in urlDatabase) {
-      if (this.userOwnsURL(user, shortURL)) {
+      if (URLFunctions.prototype.userOwnsURL(user, shortURL)) {
         urls[shortURL] = urlDatabase[shortURL];
       }
     }
@@ -41,4 +43,4 @@ const urlFunctions = {
 };
 
 
-module.exports = urlFunctions;
+module.exports = new URLFunctions();
