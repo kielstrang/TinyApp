@@ -1,10 +1,10 @@
 const express = require('express'),
   bodyParser = require('body-parser'),
   cookieSession = require('cookie-session'),
-  urldb = require('./url-database'),
-  userdb = require('./user-database'),
-  check = require('./route-helpers'),
-  random = require('./random-helpers');
+  urldb = require('./lib/url-database'),
+  userdb = require('./lib/user-database'),
+  check = require('./lib/route-helpers'),
+  random = require('./lib/random-helpers');
 
 const PORT = process.env.PORT || 8080, // default port 8080
   URL_LENGTH = 6,
