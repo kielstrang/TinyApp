@@ -21,7 +21,8 @@ app.use(cookieSession({ name: SESSION_NAME, secret: SESSION_KEY }));
 app.use(function (req, res, next) {
   res.locals = {
     user: userdb.getUser(req.session.user_id),
-    loginState: { message: '', redirect: '/urls'}
+    login: { message: 'Log in to TinyApp:', redirect: '/urls'},
+    register: { message: 'Register for TinyApp:', redirect: '/urls'}
   };
   next();
 });
@@ -70,7 +71,6 @@ app.get('/login', (req, res) => {
   if(res.locals.user) {
     res.redirect('/urls');
   } else {
-    res.locals.loginState.message = 'Log in to TinyApp:';
     res.render('login');
   }
 });
@@ -109,14 +109,14 @@ app.post('/register', check.validEmailPassword, check.emailAvailable, (req, res)
   const { email, password } = req.body;
   userdb.saveUser(userID, email, password);
   req.session.user_id = userID;
-  res.redirect('/urls');
+  res.redirect(req.body.redirect);
 });
 
 //Log in
 app.post('/login', check.validLogin, (req, res) => {
   const user = userdb.getUserByEmail(req.body.email);
   req.session.user_id = user.id;
-  res.redirect(req.body.loginRedirect);
+  res.redirect(req.body.redirect);
 });
 
 //Log out

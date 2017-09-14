@@ -7,13 +7,14 @@
 
 <body>
   <% include partials/_header %>
-  <div>Register for TinyApp:</div>
+  <div><%= register.message %></div>
   <form method="POST" action="/register">
     <label for="email">Email:</label>
     <input id="email" type="email" name="email" style="width: 300px">
     <label for="password">Password:</label>
     <input id="password" type="password" name="password" style="width: 300px">
     <input type="submit" value="Submit">
+    <input type="hidden" value=<%= register.redirect %> name="redirect">
   </form>
 </body>
 

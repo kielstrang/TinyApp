@@ -5,7 +5,7 @@ const userdb = require('./user-database');
 const expressHelpers = {
   isAuthenticated: (message, redirect) => {
     return (req, res, next) => {
-      res.locals.loginState = {message: message, redirect: redirect.replace(':id', req.params.id)};
+      res.locals.login = {message: message, redirect: redirect.replace(':id', req.params.id)};
       const user = res.locals.user;
       if(user && user.id in userdb.getAllUsers()) return next();
       res.render('login');
@@ -29,13 +29,15 @@ const expressHelpers = {
     const { email, password } = req.body;
     if(email && password) return next();
     res.status(400);
-    res.send('Please specify an email and password');
+    res.locals.register.message = 'Please specify an email and password!';
+    res.render('register');
   },
   
   emailAvailable: (req, res, next) => {
     if(!userdb.getUserByEmail(req.body.email)) return next();
     res.status(400);
-    res.send('This email is already registered');
+    res.locals.register.message = 'This email is already registered!';
+    res.render('register');
   },
   
   validLogin: (req, res, next) => {
@@ -44,7 +46,8 @@ const expressHelpers = {
   
     if(user && userdb.checkPassword(user, password)) return next();
     res.status(401);
-    res.send('Incorrect email or password');
+    res.locals.login.message = 'Invalid email or password!';
+    res.render('login');
   }
 };
 
