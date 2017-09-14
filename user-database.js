@@ -3,7 +3,8 @@ const BCRYPT_ROUNDS = 12;
 
 const userDatabase = {};
 
-const userFunctions = {
+const UserFunctions = function () {};
+UserFunctions.prototype = {
 
   getUser: (userID) => {
     return userDatabase[userID];
@@ -39,4 +40,4 @@ const userFunctions = {
   }
 };
 
-module.exports = userFunctions;
+module.exports = new UserFunctions();

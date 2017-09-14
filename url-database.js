@@ -1,7 +1,6 @@
 const urlDatabase =  {};
 
 const URLFunctions = function () {};
-
 URLFunctions.prototype = {
 
   getURL: (shortURL) => {
