@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 const urldb = require("./url-database");
+const userdb = require("./user-database");
 
 const app = express();
 const PORT = process.env.PORT || 8080; // default port 8080
@@ -10,23 +11,10 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
-let users = { 
-  "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
-    password: "correct-horse-battery-staple"
-  },
-  "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
-    password: "plaintext-passwords-are-fun"
-  }
-};
-
 //get login cookie
 app.use(function (request, response, next) {
   response.locals = {
-    user: users[request.cookies['user_id']]
+    user: userdb.getUser(request.cookies['user_id'])
   };
   next();
 });
@@ -40,18 +28,11 @@ function generateRandomString(strLength) {
   return str;
 }
 
-function getUserByEmail(email) {
-  for (const id in users) {
-    if (users[id].email === email) {
-      return users[id];
-    }
-  }
-  return undefined;
-}
+
 
 function checkLogin (request, response, next) {
   const user = response.locals.user;
-  if(user && user.id in users) {
+  if(user && user.id in userdb.getAllUsers()) {
     next();
   } else {
     response.redirect('/login');
@@ -74,6 +55,37 @@ function checkUserOwnsURL (request, response, next) {
   } else {
     response.status(401);
     response.send("You don't own this URL.");
+  }
+}
+
+function checkValidEmailPassword (request, response, next) {
+  const { email, password } = request.body;
+  if (email === '' || password === '') {
+    response.status(400);
+    response.send("Please specify an email and password");
+  } else {
+    next();
+  }
+}
+
+function checkEmailAvailable (request, response, next) {
+  if (userdb.getUserByEmail(request.body.email)) {
+    response.status(400);
+    response.send("This email is already registered");
+  } else {
+    next();
+  }
+}
+
+function checkValidLogin (request, response, next) {
+  const { email, password } = request.body;
+  const user = userdb.getUserByEmail(email);
+
+  if(user && user.password === password) {
+    next();
+  } else {
+    response.status(401);
+    response.send("Incorrect email or password");
   }
 }
 
@@ -103,7 +115,8 @@ app.get("/urls/:id", checkURLExists, (request, response) => {
 //Short URL redirects to long URL
 app.get("/u/:id", checkURLExists, (request, response) => {
   const shortURL = request.params.id;
-  const longURL = getAllURLs(shortURL).long;
+  const longURL = urldb.getURL(shortURL).long;
+  console.log('Redirecting to ' + longURL);
   response.redirect(longURL);
 });
 
@@ -137,46 +150,19 @@ app.post("/urls/:id", checkLogin, checkURLExists, checkUserOwnsURL, (request, re
 });
 
 //Register user
-app.post("/register", (request, response) => {
+app.post("/register", checkValidEmailPassword, checkEmailAvailable, (request, response) => {
   const userID = generateRandomString(8);
   const { email, password } = request.body;
-
-  //Guard for missing email or password
-  if (email === '' || password ==='') {
-    response.status(400);
-    response.send("Please specify an email and password");
-    return;
-  }
-  
-  //Guard for already registered email
-  if (getUserByEmail(email)) {
-    response.status(400);
-    response.send("This email is already registered");
-    return;
-  }
-
-  //Register the user
-  users[userID] = {
-    id: userID,
-    email: email,
-    password: password
-  };
+  userdb.saveUser(userID, email, password);
   response.cookie('user_id', userID);
   response.redirect('/urls');
 });
 
 //Log in
-app.post("/login", (request, response) => {
-  const { email, password } = request.body;
-  const user = getUserByEmail(email);
-
-  if(user && user.password === password) {
-    response.cookie('user_id', user.id);
-    response.redirect('/');
-  } else {
-    response.status(401);
-    response.send("Incorrect email or password");
-  }
+app.post("/login", checkValidLogin, (request, response) => {
+  const user = userdb.getUserByEmail(request.body.email);
+  response.cookie('user_id', user.id);
+  response.redirect('/');
 });
 
 //Log out
