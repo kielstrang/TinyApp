@@ -4,6 +4,7 @@ const express = require('express'),
   methodOverride = require('method-override'),
   urlRouter = require('./urls'),
   loginRouter = require('./login'),
+  registerRouter = require('./register'),
   config = require('./lib/config'),
   urldb = require('./lib/url-database'),
   userdb = require('./lib/user-database'),
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 
 app.use('/urls', urlRouter);
 app.use('/login', loginRouter);
+app.use('/register', registerRouter);
 
 //Root redirects to urls or login
 app.get('/', (req, res) => {
@@ -44,21 +46,6 @@ app.get('/u/:id', check.urlExists, (req, res) => {
   const url = urldb.getURL(req.params.id);
   tracking.logVisit(url, req.session);
   res.redirect(url.long);
-});
-
-//Get registration page
-app.get('/register', (req, res) => {
-  if(res.locals.user) return res.redirect('/urls');
-  res.render('register');
-});
-
-//Register user
-app.post('/register', check.validEmailPassword, check.emailAvailable, (req, res) => {
-  const userID = random.generateString(config.USER_LENGTH);
-  const { email, password } = req.body;
-  userdb.saveUser(userID, email, password);
-  req.session.user_id = userID;
-  res.redirect(req.body.redirect);
 });
 
 //Log out
