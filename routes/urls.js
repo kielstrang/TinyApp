@@ -16,7 +16,7 @@ router.route('/')
     res.render('urls_index', { userURLs });
   })
   //Add new short URL
-  .post(check.isAuthenticated('Log in to add a new shortURL:', '/urls/new'), (req, res) => {
+  .post(check.urlSpecified, check.isAuthenticated('Log in to add a new shortURL:', '/urls/new'), (req, res) => {
     const newShortURL = random.generateString(config.URL_LENGTH);
     urldb.saveURL(newShortURL, req.body.longURL, res.locals.user.id);
     res.redirect(`/urls/${newShortURL}`);
@@ -47,7 +47,7 @@ router.route('/:id')
     res.render('urls_show', { url, auth, analytics });
   })
   //Edit URL
-  .put(check.isAuthenticated('Log in to edit this shortURL:', '/urls'), check.urlExists, check.userOwnsURL, (req, res) => {
+  .put(check.urlSpecified, check.isAuthenticated('Log in to edit this shortURL:', '/urls'), check.urlExists, check.userOwnsURL, (req, res) => {
     urldb.saveURL(req.params.id, req.body.longURL, res.locals.user.id);
     res.redirect('/urls');
   });

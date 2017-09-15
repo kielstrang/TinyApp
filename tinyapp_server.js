@@ -35,6 +35,13 @@ app.get('/', (req, res) => {
 });
 
 app.use((error, req, res, next) => {
+  if(error.name === 'RequestDataMissing') {
+    return res.status(400).send(`Error: ${error.message}`);
+  }
+  next();
+});
+
+app.use((error, req, res, next) => {
   console.error(error.stack);
   res.status(500).send('TinyApp experienced an error');
 });
