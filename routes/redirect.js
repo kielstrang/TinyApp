@@ -1,7 +1,7 @@
 const express = require('express'),
-  urldb = require('./lib/url-database'),
-  check = require('./lib/route-helpers'),
-  tracking = require('./lib/tracking');
+  urldb = require('../lib/url-database'),
+  check = require('../lib/route-helpers'),
+  tracking = require('../lib/tracking');
 const router = express.Router();
 
 //Short URL redirects to long URL

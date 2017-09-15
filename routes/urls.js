@@ -1,10 +1,10 @@
 const express = require('express'),
   methodOverride = require('method-override'),
-  config = require('./lib/config'),
-  urldb = require('./lib/url-database'),
-  check = require('./lib/route-helpers'),
-  random = require('./lib/random-helpers'),
-  tracking = require('./lib/tracking');
+  config = require('../lib/config'),
+  urldb = require('../lib/url-database'),
+  check = require('../lib/route-helpers'),
+  random = require('../lib/random-helpers'),
+  tracking = require('../lib/tracking');
 const router = express.Router();
 
 router.use(methodOverride('_method'));

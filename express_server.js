@@ -1,16 +1,8 @@
 const express = require('express'),
   bodyParser = require('body-parser'),
   cookieSession = require('cookie-session'),
-  urlRouter = require('./urls'),
-  loginRouter = require('./login'),
-  registerRouter = require('./register'),
-  logoutRouter = require('./logout'),
-  redirectRouter = require('./redirect'),
   config = require('./lib/config'),
-  urldb = require('./lib/url-database'),
-  userdb = require('./lib/user-database'),
-  check = require('./lib/route-helpers'),
-  tracking = require('./lib/tracking');
+  userdb = require('./lib/user-database');
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -27,11 +19,11 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/urls', urlRouter);
-app.use('/login', loginRouter);
-app.use('/register', registerRouter);
-app.use('/logout', logoutRouter);
-app.use('/u', redirectRouter);
+app.use('/urls', require('./routes/urls'));
+app.use('/login', require('./routes/login'));
+app.use('/register', require('./routes/register'));
+app.use('/logout', require('./routes/logout'));
+app.use('/u', require('./routes/redirect'));
 
 //Root redirects to urls or login
 app.get('/', (req, res) => {
@@ -41,6 +33,7 @@ app.get('/', (req, res) => {
     res.redirect('/login');
   }
 });
+
 app.listen(config.PORT, () => {
   console.log(`Example app listening on port ${config.PORT}!`);
 });

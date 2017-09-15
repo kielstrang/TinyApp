@@ -1,8 +1,8 @@
 const express = require('express'),
-  config = require('./lib/config'),
-  userdb = require('./lib/user-database'),
-  check = require('./lib/route-helpers'),
-  random = require('./lib/random-helpers');
+  config = require('../lib/config'),
+  userdb = require('../lib/user-database'),
+  check = require('../lib/route-helpers'),
+  random = require('../lib/random-helpers');
 const router = express.Router();
 
 router.route('/')

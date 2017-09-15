@@ -1,6 +1,6 @@
 const express = require('express'),
-  userdb = require('./lib/user-database'),
-  check = require('./lib/route-helpers');
+  userdb = require('../lib/user-database'),
+  check = require('../lib/route-helpers');
 const router = express.Router();
 
 //Get login page
