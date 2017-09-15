@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
   }
 });
 
-app.use(...require('./lib/error-handlers'));
+app.use(...require('./routes/error-handlers'));
 
 app.listen(config.PORT, () => {
   console.log(`TinyApp listening on port ${config.PORT}!`);
