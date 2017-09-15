@@ -2,22 +2,18 @@ const express = require('express'),
   bodyParser = require('body-parser'),
   cookieSession = require('cookie-session'),
   methodOverride = require('method-override'),
+  config = require('./lib/config'),
   urldb = require('./lib/url-database'),
   userdb = require('./lib/user-database'),
   check = require('./lib/route-helpers'),
   random = require('./lib/random-helpers');
 
-const PORT = process.env.PORT || 8080, // default port 8080
-  URL_LENGTH = 6,
-  USER_LENGTH = 8,
-  VISITOR_LENGTH = 7,
-  SESSION_NAME = 'tinyapp-session',
-  SESSION_KEY = 'correct-horse-battery-staple';
+console.log(config);
 
 const app = express();
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieSession({ name: SESSION_NAME, secret: SESSION_KEY }));
+app.use(cookieSession({ name: config.SESSION_NAME, secret: config.SESSION_KEY }));
 app.use(methodOverride('_method'));
 
 //read user from session cookie
@@ -65,15 +61,7 @@ app.get('/urls/:id', check.urlExists, (req, res) => {
 //Short URL redirects to long URL
 app.get('/u/:id', check.urlExists, (req, res) => {
   const url = urldb.getURL(req.params.id);
-  url.analytics.visits += 1;
-  if(req.session.user_id) {
-    url.analytics.visitors.add(req.session.user_id);
-  } else {
-    if(!req.session.visitor_id) {
-      req.session.visitor_id = random.generateString(VISITOR_LENGTH);
-    }
-    url.analytics.visitors.add(req.session.visitor_id);
-  }
+  urldb.logVisit(url, req.session);
   res.redirect(url.long);
 });
 
@@ -91,7 +79,7 @@ app.get('/register', (req, res) => {
 
 //Add new short URL
 app.post('/urls', check.isAuthenticated('Log in to add a new shortURL:', '/urls/new'), (req, res) => {
-  const newShortURL = random.generateString(URL_LENGTH);
+  const newShortURL = random.generateString(config.URL_LENGTH);
   urldb.saveURL(newShortURL, req.body.longURL, res.locals.user.id);
   res.redirect(`/urls/${newShortURL}`);
 });
@@ -110,7 +98,7 @@ app.put('/urls/:id', check.isAuthenticated('Log in to edit this shortURL:', '/ur
 
 //Register user
 app.post('/register', check.validEmailPassword, check.emailAvailable, (req, res) => {
-  const userID = random.generateString(USER_LENGTH);
+  const userID = random.generateString(config.USER_LENGTH);
   const { email, password } = req.body;
   userdb.saveUser(userID, email, password);
   req.session.user_id = userID;
@@ -130,6 +118,6 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 });
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+app.listen(config.PORT, () => {
+  console.log(`Example app listening on port ${config.PORT}!`);
 });
