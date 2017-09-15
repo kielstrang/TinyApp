@@ -34,6 +34,11 @@ app.get('/', (req, res) => {
   }
 });
 
+app.use((error, req, res, next) => {
+  console.error(error.stack);
+  res.status(500).send('TinyApp experienced an error');
+});
+
 app.listen(config.PORT, () => {
   console.log(`TinyApp listening on port ${config.PORT}!`);
 });
