@@ -2,7 +2,7 @@
   "name": "tinyapp",
   "version": "1.0.0",
   "description": "TinyApp URL shortener",
-  "main": "express_server.js",
+  "main": "tinyapp_server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
