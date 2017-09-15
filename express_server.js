@@ -35,5 +35,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(config.PORT, () => {
-  console.log(`Example app listening on port ${config.PORT}!`);
+  console.log(`TinyApp listening on port ${config.PORT}!`);
 });
