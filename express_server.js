@@ -5,6 +5,7 @@ const express = require('express'),
   loginRouter = require('./login'),
   registerRouter = require('./register'),
   logoutRouter = require('./logout'),
+  redirectRouter = require('./redirect'),
   config = require('./lib/config'),
   urldb = require('./lib/url-database'),
   userdb = require('./lib/user-database'),
@@ -30,6 +31,7 @@ app.use('/urls', urlRouter);
 app.use('/login', loginRouter);
 app.use('/register', registerRouter);
 app.use('/logout', logoutRouter);
+app.use('/u', redirectRouter);
 
 //Root redirects to urls or login
 app.get('/', (req, res) => {
@@ -39,14 +41,6 @@ app.get('/', (req, res) => {
     res.redirect('/login');
   }
 });
-
-//Short URL redirects to long URL
-app.get('/u/:id', check.urlExists, (req, res) => {
-  const url = urldb.getURL(req.params.id);
-  tracking.logVisit(url, req.session);
-  res.redirect(url.long);
-});
-
 app.listen(config.PORT, () => {
   console.log(`Example app listening on port ${config.PORT}!`);
 });
