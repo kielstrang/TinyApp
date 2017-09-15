@@ -14,6 +14,7 @@
       <input type="submit" value="Update">
     </form>
     <div> Visits: <%= url.analytics.visits %></div>
+    <div> Unique Visitors: <%= url.analytics.visitors.size %></div>
   <% } else { %>
     <div><%= url.short %> &rarr; <a href=<%= `/u/${url.short}` %>><%= url.long %></a></div>
     <br>

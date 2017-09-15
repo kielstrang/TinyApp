@@ -10,6 +10,7 @@ const express = require('express'),
 const PORT = process.env.PORT || 8080, // default port 8080
   URL_LENGTH = 6,
   USER_LENGTH = 8,
+  VISITOR_LENGTH = 7,
   SESSION_NAME = 'tinyapp-session',
   SESSION_KEY = 'correct-horse-battery-staple';
 
@@ -65,6 +66,14 @@ app.get('/urls/:id', check.urlExists, (req, res) => {
 app.get('/u/:id', check.urlExists, (req, res) => {
   const url = urldb.getURL(req.params.id);
   url.analytics.visits += 1;
+  if(req.session.user_id) {
+    url.analytics.visitors.add(req.session.user_id);
+  } else {
+    if(!req.session.visitor_id) {
+      req.session.visitor_id = random.generateString(VISITOR_LENGTH);
+    }
+    url.analytics.visitors.add(req.session.visitor_id);
+  }
   res.redirect(url.long);
 });
 
