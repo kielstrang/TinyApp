@@ -17,6 +17,14 @@ module.exports = [
   },
   
   (error, req, res, next) => {
+    if(error.name === 'LoginError') {
+      res.status(401);
+      return res.render('login', { message: error.message, redirect: error.redirect });
+    }
+    next(error);
+  },
+  
+  (error, req, res, next) => {
     if(error.name === 'RegistrationError') {
       res.status(400);
       return res.render('register', { message: error.message });

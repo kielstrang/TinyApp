@@ -11,10 +11,7 @@ app.use(cookieSession({ name: config.SESSION_NAME, secret: config.SESSION_KEY })
 
 //read user from session cookie
 app.use((req, res, next) => {
-  res.locals = {
-    user: userdb.getUser(req.session.user_id),
-    login: { message: 'Log in to TinyApp:', redirect: '/urls'}
-  };
+  res.locals.user = userdb.getUser(req.session.user_id);
   next();
 });
 

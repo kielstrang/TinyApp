@@ -6,7 +6,7 @@ const router = express.Router();
 //Get login page
 router.get('/', (req, res) => {
   if(res.locals.user) return res.redirect('/urls');
-  res.render('login');
+  res.render('login', { message: 'Log in to TinyApp:', redirect: '/urls'});
 });
 
 //Log in
