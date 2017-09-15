@@ -15,6 +15,14 @@ module.exports = [
     }
     next(error);
   },
+  
+  (error, req, res, next) => {
+    if(error.name === 'RegistrationError') {
+      res.status(400);
+      return res.render('register', { message: error.message });
+    }
+    next(error);
+  },
 
   (error, req, res, next) => {
     console.error(error.stack);

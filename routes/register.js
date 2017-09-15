@@ -9,7 +9,7 @@ router.route('/')
   //Get registration page
   .get((req, res) => {
     if(res.locals.user) return res.redirect('/urls');
-    res.render('register');
+    res.render('register', { message: 'Register for TinyApp:' });
   })
   //Register user
   .post(check.validEmailPassword, check.emailAvailable, (req, res) => {
@@ -17,7 +17,7 @@ router.route('/')
     const { email, password } = req.body;
     userdb.saveUser(userID, email, password);
     req.session.user_id = userID;
-    res.redirect(req.body.redirect);
+    res.redirect('/urls');
   });
 
 module.exports = router;
