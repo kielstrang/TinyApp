@@ -23,7 +23,7 @@ router.route('/')
   });
 
 //Delete URL
-router.delete('/:id/delete', check.isAuthenticated('Log in to delete a shortURL:', '/urls'), check.urlExists, check.userOwnsURL, (req, res) => {
+router.delete('/:id/delete', check.urlExists, check.isAuthenticated('Log in to delete a shortURL:', '/urls'), check.userOwnsURL, (req, res) => {
   urldb.deleteURL(req.params.id);
   res.redirect('/urls');
 });
@@ -47,7 +47,7 @@ router.route('/:id')
     res.render('urls_show', { url, auth, analytics });
   })
   //Edit URL
-  .put(check.urlSpecified, check.isAuthenticated('Log in to edit this shortURL:', '/urls'), check.urlExists, check.userOwnsURL, (req, res) => {
+  .put(check.urlExists, check.urlSpecified, check.isAuthenticated('Log in to edit this shortURL:', '/urls'), check.userOwnsURL, (req, res) => {
     urldb.saveURL(req.params.id, req.body.longURL, res.locals.user.id);
     res.redirect('/urls');
   });
