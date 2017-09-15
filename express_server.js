@@ -63,9 +63,9 @@ app.get('/urls/:id', check.urlExists, (req, res) => {
 
 //Short URL redirects to long URL
 app.get('/u/:id', check.urlExists, (req, res) => {
-  const shortURL = req.params.id;
-  const longURL = urldb.getURL(shortURL).long;
-  res.redirect(longURL);
+  const url = urldb.getURL(req.params.id);
+  url.analytics.visits += 1;
+  res.redirect(url.long);
 });
 
 //Get login page

@@ -13,6 +13,7 @@
       <input type="text" style="width:300px" name="longURL" value=<%= url.long %>>
       <input type="submit" value="Update">
     </form>
+    <div> Visits: <%= url.analytics.visits %></div>
   <% } else { %>
     <div><%= url.short %> &rarr; <a href=<%= `/u/${url.short}` %>><%= url.long %></a></div>
     <br>
