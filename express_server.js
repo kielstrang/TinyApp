@@ -3,6 +3,7 @@ const express = require('express'),
   cookieSession = require('cookie-session'),
   methodOverride = require('method-override'),
   urlRouter = require('./urls'),
+  loginRouter = require('./login'),
   config = require('./lib/config'),
   urldb = require('./lib/url-database'),
   userdb = require('./lib/user-database'),
@@ -27,6 +28,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/urls', urlRouter);
+app.use('/login', loginRouter);
 
 //Root redirects to urls or login
 app.get('/', (req, res) => {
@@ -44,12 +46,6 @@ app.get('/u/:id', check.urlExists, (req, res) => {
   res.redirect(url.long);
 });
 
-//Get login page
-app.get('/login', (req, res) => {
-  if(res.locals.user) return res.redirect('/urls');
-  res.render('login');
-});
-
 //Get registration page
 app.get('/register', (req, res) => {
   if(res.locals.user) return res.redirect('/urls');
@@ -62,13 +58,6 @@ app.post('/register', check.validEmailPassword, check.emailAvailable, (req, res)
   const { email, password } = req.body;
   userdb.saveUser(userID, email, password);
   req.session.user_id = userID;
-  res.redirect(req.body.redirect);
-});
-
-//Log in
-app.post('/login', check.validLogin, (req, res) => {
-  const user = userdb.getUserByEmail(req.body.email);
-  req.session.user_id = user.id;
   res.redirect(req.body.redirect);
 });
 
