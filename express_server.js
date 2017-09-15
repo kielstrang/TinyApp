@@ -16,7 +16,7 @@ const app = express();
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({ name: config.SESSION_NAME, secret: config.SESSION_KEY }));
-app.use(methodOverride('_method'));
+//app.use(methodOverride('_method'));
 
 //read user from session cookie
 app.use((req, res, next) => {
