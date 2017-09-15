@@ -10,6 +10,13 @@ module.exports = [
   },
   
   (error, req, res, next) => {
+    if(error.name === 'URLPermissionError') {
+      return res.status(401).send(error.message);
+    }
+    next(error);
+  },
+  
+  (error, req, res, next) => {
     if(error.name === 'RequestDataMissing') {
       return res.status(400).send(`Error: ${error.message}`);
     }
