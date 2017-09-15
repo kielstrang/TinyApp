@@ -6,9 +6,8 @@ const express = require('express'),
   urldb = require('./lib/url-database'),
   userdb = require('./lib/user-database'),
   check = require('./lib/route-helpers'),
-  random = require('./lib/random-helpers');
-
-console.log(config);
+  random = require('./lib/random-helpers'),
+  analytics = require('./lib/analytics');
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -55,13 +54,14 @@ app.get('/urls/notfound', (req, res) => {
 app.get('/urls/:id', check.urlExists, (req, res) => {
   const url = urldb.getURL(req.params.id);
   const auth = urldb.userOwnsURL(res.locals.user, url.short);
-  res.render('urls_show', { url, auth });
+  const urlAnalytics = analytics.getAnalytics(url);
+  res.render('urls_show', { url, auth, urlAnalytics });
 });
 
 //Short URL redirects to long URL
 app.get('/u/:id', check.urlExists, (req, res) => {
   const url = urldb.getURL(req.params.id);
-  urldb.logVisit(url, req.session);
+  analytics.logVisit(url, req.session);
   res.redirect(url.long);
 });
 

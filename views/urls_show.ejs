@@ -13,7 +13,19 @@
       <input type="text" style="width:300px" name="longURL" value=<%= url.long %>>
       <input type="submit" value="Update">
     </form>
-    <div><%= url.analytics.visitCount %> visits from <%= url.analytics.uniqueVisitors.size %> unique visitors.</div>
+    <div><%= urlAnalytics.visits %> visits from <%= urlAnalytics.visitors %> unique visitors.</div>
+    <table>
+      <tr>
+        <td>Visitor</td>
+        <td>Time</td>
+      </tr>
+      <% for(const visit of urlAnalytics.history) { %>
+        <tr>
+          <td><%= visit.visitor %></td>
+          <td><%= visit.time %></td>
+        </tr>
+      <% } %>
+    </table>
   <% } else { %>
     <div><%= url.short %> &rarr; <a href=<%= `/u/${url.short}` %>><%= url.long %></a></div>
     <br>
