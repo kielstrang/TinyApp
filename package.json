@@ -1,12 +1,12 @@
 {
-  "name": "express-server",
+  "name": "tinyapp",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "TinyApp URL shortener",
+  "main": "express_server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Kiel Strang",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^1.0.3",
