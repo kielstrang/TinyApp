@@ -15,20 +15,12 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/', require('./routes/main'));
 app.use('/urls', require('./routes/urls'));
 app.use('/login', require('./routes/login'));
 app.use('/register', require('./routes/register'));
 app.use('/logout', require('./routes/logout'));
 app.use('/u', require('./routes/redirect'));
-
-//Root redirects to urls or login
-app.get('/', (req, res) => {
-  if(res.locals.user) {
-    res.redirect('/urls');
-  } else {
-    res.redirect('/login');
-  }
-});
 
 app.use(...require('./routes/error-handlers'));
 
